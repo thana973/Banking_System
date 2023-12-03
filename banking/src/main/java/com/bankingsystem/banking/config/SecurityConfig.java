@@ -15,7 +15,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/index", "/login","/joinUp").permitAll()    // LoadBalancer Chk
+                .antMatchers("/", "/index", "/login","/joinUp","/mail").permitAll()    // LoadBalancer Chk
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -24,6 +24,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .permitAll();
+        http
+                .csrf().disable();
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
