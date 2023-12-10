@@ -32,44 +32,52 @@
 			border-radius: 4px;
 		}
 
-		input[type="submit"] {
+		input[type="button"] {
 			background-color: #4caf50;
 			color: #fff;
 			cursor: pointer;
 		}
 
-		input[type="submit"]:hover {
+		input[type="button"]:hover {
 			background-color: #45a049;
 		}
 	</style>
 </head>
 <body>
-	<form action="/joinUp" method="post">
-		<!-- Name -->
-		<label for="name">Name:</label>
-		<input type="text" id="name" name="name"><br>
+	<form id="joinUp" action="/joinUp" method="post">
+		<!-- id -->
+		<label for="memberId">id:</label>
+		<input type="text" id="memberId" name="memberId"><br>
+		<button type="button" id="isIdDuplicateBtn" name="isIdDuplicateBtn" onclick="isIdDuplicate()">중복검사</button>
+		<span id="errorMessage" style="color: red;"></span>
 
 		<%--email--%>
 		<label for="mail">mail:</label>
-		<input type="text" id="mail" name="main"><br>
-		<button type="button" id="sendBtn" name="sendBtn" onclick="sendNumber()">인증번호</button>
+		<input type="text" id="mail" name="mail"><br>
+		<button type="button" id="sendNumberBtn" name="sendNumberBtn" onclick="sendNumber()">인증번호</button>
 
 		<div id="mail_number" name="mail_number" style="display: none">
 			<input type="text" name="mailConfirmNumber" id="mailConfirmNumber" style="width:250px; margin-top: -10px" placeholder="인증번호 입력">
 			<button type="button" name="confirmBtn" id="confirmBtn" onclick="confirmNumber()">이메일 인증</button>
 		</div>
 
+		<!-- Name -->
+		<label for="name">Name:</label>
+		<input type="text" id="name" name="name"><br>
+
 		<!-- Password -->
 		<label for="password">Password:</label>
 		<input type="password" id="password" name="password"><br>
+		<span id="pwdErrorMessage" style="color: red;"></span>
 
 		<!-- Confirm Password -->
 		<label for="password2">Confirm Password:</label>
 		<input type="password" id="password2" name="password2"><br>
+		<span id="pwdConfirmerrorMessage" style="color: red;"></span>
 
 		<!-- Identification (주민번호) -->
 		<label for="identification">Identification:</label>
-		<input type="text" id="identification" name="identification"><br>
+		<input type="password" id="identification" name="identification" inputmode="numeric" pattern="[0-9]*" maxlength="13"><br>
 
 		<!-- Phone Number -->
 		<label for="phoneNum">Phone Number:</label>
@@ -86,50 +94,123 @@
 		<input type="text" id="sample6_detailAddress" placeholder="상세주소">
 		<input type="text" id="sample6_extraAddress" placeholder="참고항목">
 
-		<input type="submit" value="Register" id="registerButton" disabled>
+		<input type="button" value="Register" id="registerButton">
 	</form>
 </body>
 </html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="text/javascript">
-	// 세션에 저장된 메시지를 확인하고 alert 창에 표시
-	var emailVerificationMessage = "<%= session.getAttribute("emailVerificationMessage") %>";
-	if (emailVerificationMessage && emailVerificationMessage !== "null") {
-		alert(emailVerificationMessage);
+	// id 중복검사
+	var idCheck = true;
+	function isIdDuplicate(){
+		const idInput = document.forms['joinUp'].elements['memberId'];
+		const errorMessageSpan = $("#errorMessage");
+		if(idInput.value){
+			$.ajax({
+				url: "/isIdDuplicate",
+				type: "post",
+				data: { "memberId": idInput.value },
+				success: function(data) {
+					if(data){
+						errorMessageSpan.text("존재하는 아이디입니다.");
+					} else {
+						if(/^[a-zA-Z0-9]{1,10}$/.test(idInput.value)){
+							errorMessageSpan.text("사용가능 합니다.");
+							idCheck = data;
+						}else {
+							errorMessageSpan.text("아이디는 10자리 이하의 숫자와 영문자로만 이뤄져야 합니다.");
+						}
+					}
+				},
+				error: function(e) {
+					console.error("AJAX request failed.",e);
+					alert("AJAX 요청 중 오류가 발생했습니다.");
+				}
+			});
+		} else {
+			alert("아이디를 입력하세요");
+		}
 	}
 
 	var confirmationCode;
 	function sendNumber(){
-		$("#mail_number").show();
-		$("#sendBtn").hide();
-		$.ajax({
-			url: "/mail",
-			type: "post",
-			data: { "mail": $("#mail").val() },
-			success: function(data) {
-				console.log("인증번호 발송");
-				confirmationCode = data;
-			},
-			error: function(request, status, error) {
-				console.error("AJAX request failed. Status:", status, "Error:", error);
-				alert("AJAX 요청 중 오류가 발생했습니다.");
-			}
-		});
+		const emailInput = document.forms['joinUp'].elements['mail'];
+		if(idCheck){
+			return alert("아이디 중복 검사를 진행해주세요")
+		}
+		if(emailInput.value){
+			$("#mail_number").show();
+			$("#sendNumberBtn").hide();
+			$.ajax({
+				url: "/mail",
+				type: "post",
+				data: { "mail": emailInput.value },
+				success: function(data) {
+					console.log("인증번호 발송");
+					confirmationCode = data;
+				},
+				error: function(request, status, error) {
+					console.error("AJAX request failed. Status:", status, "Error:", error);
+					alert("AJAX 요청 중 오류가 발생했습니다.");
+				}
+			});
+		} else {
+			alert("이메일을 입력하세요")
+		}
 	}
 
 	function confirmNumber(){
-		var userEnteredCode = $("#mailConfirmNumber").val();
+		const userEnteredCode = $("#mailConfirmNumber").val();
 
 		if(userEnteredCode === confirmationCode){
 			alert("인증되었습니다.");
-			$("#registerButton").prop("disabled", false);
 			$("#mail_number").hide();
+			$("#registerButton").prop("disabled", false);
 		}else{
 			alert("번호가 다릅니다.");
 			$("#registerButton").prop("disabled", true);
 		}
 	}
+	$(document).ready(function(){
+		// 주민번호 숫자만 입력 받기
+		$("#identification").on("input",function(){
+			$(this).val($(this).val().replace(/[^0-9]/g, ''));
+		});
+		$("#registerButton").click(function(){
+			const form = document.forms['joinUp'];
+			const pwd= form.elements['password'];
+			const pwdConfirm = form.elements['password2'];
+			const identification = form.elements['identification'];
+			const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/;
+			const residentNumberRegex = /^[0-9]{13}$/;
+			if(pwd.value.match(passwordRegex) == null){
+				return alert("비밀번호는 문자와 숫자, 특수 기호를 포함한 8-12자리 입니다.");
+			}
+			if(pwd.value !== pwdConfirm.value){
+				return alert("비밀번호와 비밀번호 확인이 맞지 않습니다.");
+			}
+
+			$.ajax({
+				type: "POST",
+				url: "/joinUp",
+				data: $("#joinUp").serialize(),
+				success: function(response) {
+					if (response === "joinUpFailed") {
+						alert("회원가입에 실패하였습니다. 다시 시도해주세요.");
+					} else if (response === "emailVerificationFailed") {
+						alert("이메일 인증에 실패했습니다. 다시 시도해주세요.");
+					} else {
+						window.location.href = "/completed";
+					}
+				},
+				error: function(error) {
+					// Handle errors during the AJAX request
+					console.error("Error:", error);
+				}
+			});
+		})
+	});
 
 	function sample6_execDaumPostcode() {
 		new daum.Postcode({
