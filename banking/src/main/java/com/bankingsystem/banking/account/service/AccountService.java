@@ -29,6 +29,10 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
+    public boolean canWithDraw(Account account, Long amount){
+        return false;
+    }
+
 
 
     // =================== PRIVATE ======================
