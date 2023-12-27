@@ -11,8 +11,9 @@ public class AccountService {
     @Autowired
     AccountRepository accountRepository;
 
+    // =================== PUBLIC ======================
 
-    public Account saveAccount(String memberId, String bankName, int productId){
+    public Account createAccount(String memberId, String bankName, int productId){
         String accountNum;
 
         do {
@@ -22,6 +23,15 @@ public class AccountService {
         Account account = new Account(accountNum,memberId,bankName,productId);
         return accountRepository.save(account);
     }
+
+    public Account updateBalance(Account account, Long balance){
+        account.setBalance(balance);
+        return accountRepository.save(account);
+    }
+
+
+
+    // =================== PRIVATE ======================
 
     private boolean existAccountNum(String accountNum){
         return accountRepository.existsById(accountNum);

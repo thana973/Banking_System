@@ -14,7 +14,6 @@ import javax.persistence.Id;
 @Entity
 @NoArgsConstructor
 @Getter
-@Setter
 @ToString
 public class Account {
 
@@ -38,6 +37,7 @@ public class Account {
     @Column(name = "STATUS")
     private boolean restricted;
 
+    @Setter
     @Column(name = "BALANCE")
     private Long balance;
 
@@ -45,6 +45,9 @@ public class Account {
     @Column(name = "PRODUCT_PRODUCT_ID",nullable = false)
     private int productId;
 
+    /**
+     * 이 생성자를 사용하지 않고, AccountService의 saveAccount 메서드 사용하도록 함.
+     */
     public Account(String accountNum, String memberId, String bankName, int productId){
         this.accountNum = accountNum;
         this.memberId = memberId;
@@ -53,7 +56,5 @@ public class Account {
         this.balance = 0L;
         this.productId = productId;
     }
-
-
 
 }
