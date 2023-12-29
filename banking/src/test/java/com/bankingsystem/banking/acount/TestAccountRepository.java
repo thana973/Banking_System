@@ -31,6 +31,7 @@ public class TestAccountRepository {
 
     @BeforeEach
     void setUp(){
+        accountRepository.deleteAll();
         member = Member.builder()
                 .name("name")
                 .password("1234")
