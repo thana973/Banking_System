@@ -29,10 +29,29 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    public boolean canWithDraw(Account account, Long amount){
-        return false;
+    public void setLock(Account account){
+        account.setLock();
+        accountRepository.save(account);
     }
 
+    public void setUnLock(Account account){
+        account.setUnLock();
+        accountRepository.save(account);
+    }
+
+    public boolean isLocked(Account account){
+        return account.isLocked();
+    }
+
+    // private 으로 변경되어야 함
+    public boolean canWithDraw(Account account, Long amount){
+
+        Account foundAccount = accountRepository.findById(account.getAccountNum()).orElseThrow();
+        if(foundAccount.getBalance() >= amount){
+            return true;
+        }
+        return false;
+    }
 
 
     // =================== PRIVATE ======================

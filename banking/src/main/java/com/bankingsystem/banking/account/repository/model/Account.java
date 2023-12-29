@@ -35,7 +35,7 @@ public class Account {
     private String bankName;
 
     @Column(name = "STATUS")
-    private boolean restricted;
+    private boolean locked;
 
     @Setter
     @Column(name = "BALANCE")
@@ -52,9 +52,17 @@ public class Account {
         this.accountNum = accountNum;
         this.memberId = memberId;
         this.bankName = bankName;
-        this.restricted = false;
+        this.locked = false;
         this.balance = 0L;
         this.productId = productId;
+    }
+
+    public void setLock(){
+        this.locked = true;
+    }
+
+    public void setUnLock(){
+        this.locked = false;
     }
 
 }
