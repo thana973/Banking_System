@@ -28,8 +28,7 @@ public class AccountService {
     }
 
     public void deleteAccountList(String[] accountNumList){
-        for(int i = 0; i < accountNumList.length; i++){
-            String accountNum = accountNumList[i];
+        for (String accountNum : accountNumList) {
             deleteAccountBy(accountNum);
         }
     }
@@ -50,9 +49,9 @@ public class AccountService {
     }
 
 
-    public Account updateBalance(Account account, Long balance){
+    public void updateBalance(Account account, Long balance){
         account.setBalance(balance);
-        return accountRepository.save(account);
+        accountRepository.save(account);
     }
 
     public void setLock(Account account){
