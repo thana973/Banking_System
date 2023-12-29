@@ -1,14 +1,13 @@
 package com.bankingsystem.banking.account.repository.model;
 
 
+import com.bankingsystem.banking.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 
 @Entity
@@ -28,8 +27,9 @@ public class Account {
     private String accountNum;
 
     // MEMBER 테이블과 매핑 필요
-    @Column(name = "MEMBER_ID",length = 10,nullable = false)
-    private String memberId;
+    @ManyToOne
+    @JoinColumn(name="MEMBER_ID")
+    private Member member;
 
     @Column(name = "BANK_NAME",length = 20)
     private String bankName;
@@ -48,9 +48,9 @@ public class Account {
     /**
      * 이 생성자를 사용하지 않고, AccountService의 saveAccount 메서드 사용하도록 함.
      */
-    public Account(String accountNum, String memberId, String bankName, int productId){
+    public Account(String accountNum, Member member, String bankName, int productId){
         this.accountNum = accountNum;
-        this.memberId = memberId;
+        this.member = member;
         this.bankName = bankName;
         this.locked = false;
         this.balance = 0L;

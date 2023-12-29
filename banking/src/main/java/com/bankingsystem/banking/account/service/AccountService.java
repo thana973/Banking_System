@@ -2,6 +2,7 @@ package com.bankingsystem.banking.account.service;
 
 import com.bankingsystem.banking.account.repository.AccountRepository;
 import com.bankingsystem.banking.account.repository.model.Account;
+import com.bankingsystem.banking.member.domain.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +14,14 @@ public class AccountService {
 
     // =================== PUBLIC ======================
 
-    public Account createAccount(String memberId, String bankName, int productId){
+    public Account createAccount(Member member, String bankName, int productId){
         String accountNum;
 
         do {
             accountNum = generateAccountNum(productId,bankName);
         }while (existAccountNum(accountNum));
 
-        Account account = new Account(accountNum,memberId,bankName,productId);
+        Account account = new Account(accountNum,member,bankName,productId);
         return accountRepository.save(account);
     }
 
