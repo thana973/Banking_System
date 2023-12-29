@@ -1,4 +1,4 @@
-package com.bankingsystem.banking.account.repository.model;
+package com.bankingsystem.banking.account.repository.domain;
 
 
 import com.bankingsystem.banking.member.domain.Member;
@@ -63,6 +63,14 @@ public class Account {
 
     public void setUnLock(){
         this.locked = false;
+    }
+
+    public void addBalance(Long amount){
+        this.balance += amount;
+    }
+
+    public void subtractBalance(Long amount){
+        this.balance -= amount;
     }
 
 }

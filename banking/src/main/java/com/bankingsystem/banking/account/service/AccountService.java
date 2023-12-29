@@ -1,10 +1,12 @@
 package com.bankingsystem.banking.account.service;
 
 import com.bankingsystem.banking.account.repository.AccountRepository;
-import com.bankingsystem.banking.account.repository.model.Account;
+import com.bankingsystem.banking.account.repository.domain.Account;
 import com.bankingsystem.banking.member.domain.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AccountService {
@@ -25,6 +27,29 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
+    public void deleteAccountList(String[] accountNumList){
+        for(int i = 0; i < accountNumList.length; i++){
+            String accountNum = accountNumList[i];
+            deleteAccountBy(accountNum);
+        }
+    }
+
+    public void deleteAccountBy(String accountNum){
+        accountRepository.deleteById(accountNum);
+    }
+
+    public void deposit(String accountNum, Long amount){
+        Account account = accountRepository.findById(accountNum).orElseThrow();
+        account.addBalance(amount);
+        accountRepository.save(account);
+    }
+
+
+    public List<Account> findAllBy(Member member){
+        return accountRepository.findAllByMember(member);
+    }
+
+
     public Account updateBalance(Account account, Long balance){
         account.setBalance(balance);
         return accountRepository.save(account);
@@ -44,15 +69,27 @@ public class AccountService {
         return account.isLocked();
     }
 
-    // private 으로 변경되어야 함
-    public boolean canWithDraw(Account account, Long amount){
-
-        Account foundAccount = accountRepository.findById(account.getAccountNum()).orElseThrow();
-        if(foundAccount.getBalance() >= amount){
-            return true;
+    public void withDraw(String accountNum, Long amount){
+        Account account = accountRepository.findById(accountNum).orElseThrow();
+        if(canWithDraw(account,amount)){
+            account.subtractBalance(amount);
+            accountRepository.save(account);
         }
-        return false;
     }
+
+    public void transfer(String fromAccountNum, String toAccountNum, Long amount){
+        Account fromAccount = accountRepository.findById(fromAccountNum).orElseThrow();
+        Account toAccount = accountRepository.findById(toAccountNum).orElseThrow();
+
+        if(amount > 0 && canWithDraw(fromAccount,amount)){
+            fromAccount.subtractBalance(amount);
+            toAccount.addBalance(amount);
+            accountRepository.save(fromAccount);
+            accountRepository.save(toAccount);
+        }
+
+    }
+
 
 
     // =================== PRIVATE ======================
@@ -90,6 +127,15 @@ public class AccountService {
     private String generateRandomString(){
         return String.format("%6d",(int)(Math.random()*999999) + 1)
                 .replace(" ","0");
+    }
+
+    private boolean canWithDraw(Account account, Long amount){
+
+        Account foundAccount = accountRepository.findById(account.getAccountNum()).orElseThrow();
+        if(foundAccount.getBalance() >= amount){
+            return true;
+        }
+        return false;
     }
 
 }
