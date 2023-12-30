@@ -37,7 +37,7 @@ public class AccountController {
         HttpSession session = request.getSession();
         session.setAttribute("member",member);
         session.setAttribute("accounts",accounts);
-
+        System.out.println("df");
         return "account/list";
     }
 
