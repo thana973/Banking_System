@@ -1,7 +1,9 @@
 package com.bankingsystem.banking.account.repository.domain;
 
 
+import com.bankingsystem.banking.bankname.repository.domain.BankName;
 import com.bankingsystem.banking.member.domain.Member;
+import com.bankingsystem.banking.product.repository.Product;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,14 +16,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @ToString
+@Table(name = "ACCOUNT")
 public class Account {
 
     /**
+     * <pre>
      * 계좌번호 = 계좌종류(세 자릿수) + 은행번호(한 자릿수) + 랜덤값(여섯 자릿수)
+     *
+     * -------- 예시 ---------
      * 계좌종류 : DEPOSIT(001) , CD(002)
-     * 은행번호 : A은행(1), B은행(2) <- 임시 값
+     * 은행번호 : A은행(1), B은행(2)
      */
-
     @Id
     @Column(name = "ACCOUNT_NUM",length = 15,nullable = false)
     private String accountNum;
@@ -31,8 +36,9 @@ public class Account {
     @JoinColumn(name="MEMBER_ID")
     private Member member;
 
-    @Column(name = "BANK_NAME",length = 20)
-    private String bankName;
+    @ManyToOne
+    @JoinColumn(name="BANK_NAME_ID")
+    private BankName bankName;
 
     @Column(name = "STATUS")
     private boolean locked;
@@ -42,19 +48,20 @@ public class Account {
     private Long balance;
 
     // PRODUCT 테이블과 매핑 필요
-    @Column(name = "PRODUCT_PRODUCT_ID",nullable = false)
-    private int productId;
+    @ManyToOne
+    @JoinColumn(name = "PRODUCT_PRODUCT_ID")
+    private Product product;
 
     /**
      * 이 생성자를 사용하지 않고, AccountService의 saveAccount 메서드 사용하도록 함.
      */
-    public Account(String accountNum, Member member, String bankName, int productId){
+    public Account(String accountNum, Member member, BankName bankName, Product product){
         this.accountNum = accountNum;
         this.member = member;
         this.bankName = bankName;
         this.locked = false;
         this.balance = 0L;
-        this.productId = productId;
+        this.product = product;
     }
 
     public void setLock(){
@@ -73,4 +80,9 @@ public class Account {
         this.balance -= amount;
     }
 
+    public String getProductName() {
+        return product.getProductName();
+    }
+
+    public String getBankName(){return bankName.getName();}
 }

@@ -1,10 +1,13 @@
 package com.bankingsystem.banking.account.controller;
 
-import com.bankingsystem.banking.account.repository.domain.Account;
+import com.bankingsystem.banking.account.DTO.AccountResponse;
 import com.bankingsystem.banking.account.service.AccountService;
-import com.bankingsystem.banking.account.service.AccountServiceImpl;
+import com.bankingsystem.banking.bankname.DTO.BankNameResponse;
+import com.bankingsystem.banking.bankname.service.BankNameService;
+import com.bankingsystem.banking.member.DTO.MemberBasic;
 import com.bankingsystem.banking.member.domain.Member;
 import com.bankingsystem.banking.member.repository.MemberRepository;
+import com.bankingsystem.banking.transaction.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +24,14 @@ public class AccountController {
     AccountService accountService;
 
     @Autowired
+    BankNameService bankNameService;
+
+    @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    TransactionService transactionService;
+
 
     @GetMapping("/index")
     public String index(){
@@ -31,26 +41,33 @@ public class AccountController {
     @GetMapping("/list")
     public String getAccountsByMemberName(@RequestParam(name = "username") String username, HttpServletRequest request){
         // member는 임시로 가져온 것. 추후 제거 필요.
-        Member member = memberRepository.findByName(username);
+        Member memberEntity = memberRepository.findByName(username);
 
-        List<Account> accounts = accountService.findAllBy(member);
+        MemberBasic member = MemberBasic.of(memberEntity);
+
+        List<AccountResponse> accounts = accountService.findAllByMemberBasic(member);
         HttpSession session = request.getSession();
+
         session.setAttribute("member",member);
         session.setAttribute("accounts",accounts);
-        System.out.println("df");
+
         return "account/list";
     }
 
     @GetMapping("/create")
-    public String getCreateAccount(){
+    public String getCreateAccount(HttpServletRequest request){
+        List<BankNameResponse> bankNameResponseList = bankNameService.getBankNameResponseList();
+        request.setAttribute("bankNameList",bankNameResponseList);
         return "account/create";
     }
 
     @PostMapping("/create")
-    public String createAccount(@RequestParam("bankName") String bankName, @RequestParam("productId") String productId,HttpServletRequest request){
-        Member member = (Member) request.getSession().getAttribute("member");
-        if(bankName != null && !productId.isEmpty())
-            accountService.createAccount(member,bankName,Integer.parseInt(productId));
+    public String createAccount(@RequestParam("bankId") String bankId, @RequestParam("productId") String productId,HttpServletRequest request){
+
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
+
+        if(bankId != null && productId != null)
+            accountService.createAccount(member,bankId,Integer.parseInt(productId));
         return "redirect:list?username=" + member.getName();
     }
 
@@ -61,7 +78,7 @@ public class AccountController {
 
     @PostMapping("/delete")
     public String deleteAccount(HttpServletRequest request){
-        Member member = (Member) request.getSession().getAttribute("member");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
 
         String[] accountNums = request.getParameterValues("accountNum");
         if(accountNums.length > 0)
@@ -76,9 +93,9 @@ public class AccountController {
 
     @PostMapping("/deposit")
     public String depositAccount(HttpServletRequest request){
-        Member member = (Member) request.getSession().getAttribute("member");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
         String accountNum = request.getParameter("accountNum");
-        Long amount = Long.parseLong(request.getParameter("amount"));
+        long amount = Long.parseLong(request.getParameter("amount"));
 
         if (accountNum != null && amount > 0)
             accountService.deposit(accountNum,amount);
@@ -92,29 +109,11 @@ public class AccountController {
 
     @PostMapping("/withdraw")
     public String withDrawAccount(HttpServletRequest request){
-        Member member = (Member) request.getSession().getAttribute("member");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
         String accountNum = request.getParameter("accountNum");
-        Long amount = Long.parseLong(request.getParameter("amount"));
-
+        long amount = Long.parseLong(request.getParameter("amount"));
         if (accountNum != null && amount > 0)
             accountService.withDraw(accountNum,amount);
-        return "redirect:list?username=" + member.getName();
-    }
-
-    @GetMapping("/transfer")
-    public String getTransferPage(){
-        return "account/transfer";
-    }
-
-    @PostMapping("/transfer")
-    public String transferAccount(HttpServletRequest request){
-        Member member = (Member) request.getSession().getAttribute("member");
-        String fromAccountNum = request.getParameter("fromAccountNum");
-        String toAccountNum = request.getParameter("toAccountNum");
-        Long amount = Long.parseLong(request.getParameter("amount"));
-
-        if (fromAccountNum != null && toAccountNum != null && amount > 0)
-            accountService.transfer(fromAccountNum,toAccountNum,amount);
         return "redirect:list?username=" + member.getName();
     }
 

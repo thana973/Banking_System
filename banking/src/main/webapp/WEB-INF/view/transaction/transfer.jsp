@@ -1,5 +1,6 @@
 <%@ page import="com.bankingsystem.banking.account.repository.domain.Account" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.bankingsystem.banking.account.DTO.AccountResponse" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -9,10 +10,10 @@
 
 <form action="./transfer" method="POST">
     <%
-        List<Account> accounts =  (List<Account>) request.getSession().getAttribute("accounts");
-        for (Account account : accounts){
+        List<AccountResponse> accounts =  (List<AccountResponse>) request.getSession().getAttribute("accounts");
+        for (AccountResponse account : accounts){
     %>
-    <input type="radio" name="fromAccountNum" value = <%=account.getAccountNum()%> onclick="getCheckboxValue(event)">계좌번호 : <%=account.getAccountNum()%> </input>
+    <input type="radio" name="fromAccountNum" value = <%=account.getAccountNum()%>>계좌번호 : <%=account.getAccountNum()%> </input>
     <br>
     <%}%>
     <br>

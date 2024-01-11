@@ -1,12 +1,16 @@
 package com.bankingsystem.banking.account.service;
 
+import com.bankingsystem.banking.account.DTO.AccountResponse;
 import com.bankingsystem.banking.account.repository.domain.Account;
+import com.bankingsystem.banking.member.DTO.MemberBasic;
 import com.bankingsystem.banking.member.domain.Member;
 
 import java.util.List;
 
 public interface AccountService {
-    Account createAccount(Member member, String bankName, int productId);
+    Account createAccount(MemberBasic memberBasic, String bankName, int productId);
+
+    Account saveAccount(Account account);
 
     void deleteAccountList(String[] accountNumList);
 
@@ -14,7 +18,9 @@ public interface AccountService {
 
     void deposit(String accountNum, Long amount);
 
-    List<Account> findAllBy(Member member);
+    Account findByAccountId(String id);
+
+    List<AccountResponse> findAllByMemberBasic(MemberBasic memberRequest);
 
     void updateBalance(Account account, Long balance);
 
@@ -26,5 +32,5 @@ public interface AccountService {
 
     void withDraw(String accountNum, Long amount);
 
-    void transfer(String fromAccountNum, String toAccountNum, Long amount);
+    boolean canWithDraw(Account account, Long amount);
 }

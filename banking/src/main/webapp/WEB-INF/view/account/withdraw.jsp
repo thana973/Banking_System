@@ -1,5 +1,6 @@
 <%@ page import="com.bankingsystem.banking.account.repository.domain.Account" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.bankingsystem.banking.account.DTO.AccountResponse" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -7,18 +8,38 @@
 </head>
 <body>
 
-<form action="./withdraw" method="POST">
+<form method="POST">
     <%
-        List<Account> accounts =  (List<Account>) request.getSession().getAttribute("accounts");
-        for (Account account : accounts){
+        List<AccountResponse> accounts =  (List<AccountResponse>) request.getSession().getAttribute("accounts");
+        for (AccountResponse account : accounts){
     %>
-    <input type="radio" name="accountNum" value = <%=account.getAccountNum()%> onclick="getCheckboxValue(event)">계좌번호 : <%=account.getAccountNum()%> </input>
+    <input type="radio" name="accountNum" value = <%=account.getAccountNum()%>>계좌번호 : <%=account.getAccountNum()%> </input>
     <br>
     <%}%>
     <br>
     출금 금액 : <input type="text" name="amount" />
-    <button type="submit">출금</button>
+    <button type="button" onclick="submitFrom(this.form)">출금</button>
 </form>
+
+<script>
+    var doubleSummitFlag = false // 중복 POST 요청 방지 플래그
+
+    function submitFrom(form){
+        if (form.amount.value == ""){
+            alert("금액을 입력해주세요.")
+            return false;
+        }
+
+        if(doubleSummitFlag){
+            alert("요청 중 입니다.")
+            return false;
+        }else {
+            doubleSummitFlag = true;
+            form.action = "./withdraw"
+            form.submit();
+        }
+    }
+</script>
 
 </body>
 </html>
