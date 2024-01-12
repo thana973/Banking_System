@@ -7,11 +7,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-public class AccountResponse {
+public class AccountResponse implements Serializable {
+    private static final long serialVersionUID = 4789074890911556372L;
+
     private final String accountNum;
     private final String bankName;
     private final boolean locked;

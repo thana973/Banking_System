@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,6 +33,9 @@ public class AccountController {
     @Autowired
     TransactionService transactionService;
 
+    private static final String MEMBER_PARAM = "member";
+    private static final String ACCOUNT_NUMBER = "accountNum";
+
 
     @GetMapping("/index")
     public String index(){
@@ -45,10 +49,10 @@ public class AccountController {
 
         MemberBasic member = MemberBasic.of(memberEntity);
 
-        List<AccountResponse> accounts = accountService.findAllByMemberBasic(member);
+        ArrayList<AccountResponse> accounts = new ArrayList<>(accountService.findAllByMemberBasic(member));
         HttpSession session = request.getSession();
 
-        session.setAttribute("member",member);
+        session.setAttribute(MEMBER_PARAM,member);
         session.setAttribute("accounts",accounts);
 
         return "account/list";
@@ -64,7 +68,7 @@ public class AccountController {
     @PostMapping("/create")
     public String createAccount(@RequestParam("bankId") String bankId, @RequestParam("productId") String productId,HttpServletRequest request){
 
-        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute(MEMBER_PARAM);
 
         if(bankId != null && productId != null)
             accountService.createAccount(member,bankId,Integer.parseInt(productId));
@@ -78,9 +82,9 @@ public class AccountController {
 
     @PostMapping("/delete")
     public String deleteAccount(HttpServletRequest request){
-        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute(MEMBER_PARAM);
 
-        String[] accountNums = request.getParameterValues("accountNum");
+        String[] accountNums = request.getParameterValues(ACCOUNT_NUMBER);
         if(accountNums.length > 0)
             accountService.deleteAccountList(accountNums);
         return "redirect:list?username=" + member.getName();
@@ -93,8 +97,8 @@ public class AccountController {
 
     @PostMapping("/deposit")
     public String depositAccount(HttpServletRequest request){
-        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
-        String accountNum = request.getParameter("accountNum");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute(MEMBER_PARAM);
+        String accountNum = request.getParameter(ACCOUNT_NUMBER);
         long amount = Long.parseLong(request.getParameter("amount"));
 
         if (accountNum != null && amount > 0)
@@ -109,8 +113,8 @@ public class AccountController {
 
     @PostMapping("/withdraw")
     public String withDrawAccount(HttpServletRequest request){
-        MemberBasic member = (MemberBasic) request.getSession().getAttribute("member");
-        String accountNum = request.getParameter("accountNum");
+        MemberBasic member = (MemberBasic) request.getSession().getAttribute(MEMBER_PARAM);
+        String accountNum = request.getParameter(ACCOUNT_NUMBER);
         long amount = Long.parseLong(request.getParameter("amount"));
         if (accountNum != null && amount > 0)
             accountService.withDraw(accountNum,amount);
