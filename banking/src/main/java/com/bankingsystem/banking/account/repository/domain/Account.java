@@ -53,7 +53,7 @@ public class Account {
     private Product product;
 
     /**
-     * 이 생성자를 사용하지 않고, AccountService의 saveAccount 메서드 사용하도록 함.
+     * 이 생성자를 사용하지 않고, AccountService 의 saveAccount 메서드 사용하도록 함.
      */
     public Account(String accountNum, Member member, BankName bankName, Product product){
         this.accountNum = accountNum;

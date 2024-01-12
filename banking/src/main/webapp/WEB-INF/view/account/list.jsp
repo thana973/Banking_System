@@ -1,6 +1,6 @@
 <%@ page import="com.bankingsystem.banking.account.DTO.AccountResponse" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE>
 <html lang="ko">
 <head>
@@ -9,7 +9,7 @@
 <body>
 
 <table border="1">
-    <caption>계좌 정보</caption>>
+    <caption>계좌 정보</caption>
     <th>계좌번호</th><th>은행</th><th>잔액</th><th>잠금여부</th><th>상품이름</th>
 <%
     ArrayList<AccountResponse> accounts =  (ArrayList<AccountResponse>) request.getSession().getAttribute("accounts");

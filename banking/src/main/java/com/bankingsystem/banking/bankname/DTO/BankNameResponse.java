@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @Getter
 @AllArgsConstructor
 @Builder
-public class BankNameResponse {
+public class BankNameResponse implements Serializable {
+    private static final long serialVersionUID = 4240634232152739911L;
 
     private final String id;
     private final String name;

@@ -7,6 +7,8 @@ import com.bankingsystem.banking.transaction.repository.domain.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service
 public class TransactionService {
 
@@ -18,11 +20,12 @@ public class TransactionService {
     /**
      * <pre>
      * 어떤 계좌번호를 외래키로 매핑해야 되는지 결정하지 못하여,
-     * 임시로 fromAccountNum을 외래키로 넘겨줌
+     * 임시로 fromAccountNum 을 외래키로 넘겨줌
      *
      * 추후 결정 필요 [24.01.11 - 김정민]
      * </pre>
      */
+    @Transactional
     public void transfer(String fromAccountNum, String toAccountNum, Long amount){
         Account fromAccount = accountService.findByAccountId(fromAccountNum);
         Account toAccount = accountService.findByAccountId(toAccountNum);

@@ -3,7 +3,6 @@ package com.bankingsystem.banking.account.service;
 import com.bankingsystem.banking.account.DTO.AccountResponse;
 import com.bankingsystem.banking.account.repository.domain.Account;
 import com.bankingsystem.banking.member.DTO.MemberBasic;
-import com.bankingsystem.banking.member.domain.Member;
 
 import java.util.List;
 

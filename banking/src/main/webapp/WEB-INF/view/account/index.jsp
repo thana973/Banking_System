@@ -1,12 +1,15 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE>
+<html lang="ko">
 <head>
     <title>Title</title>
 </head>
 <body>
 
 <form action="./list" method="GET">
-    username: <input type="text" name="username" />
+    username: <label>
+    <input type="text" name="username" />
+</label>
     <button type="submit">전송</button>
 </form>
 </body>

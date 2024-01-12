@@ -18,13 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class AccountServiceImpl implements AccountService {
 
+
     /**
      * <pre>
-     * Repository를 Service로 바꿔야함.
+     * Repository 를 Service 로 바꿔야함.
      * Account 서비스 계층에서 Product DAO 계층을 직접 호출하는 것은 지양해야함.
      *
-     * why? Product Entity와 관련한 추가적인 비즈니스 로직이 추가될 수 있음.
-     * 따라서, Product의 비즈니스 로직을 다루는 ProducrService를 호출하는 것이 적합함.
+     * why? Product Entity 와 관련한 추가적인 비즈니스 로직이 추가될 수 있음.
+     * 따라서, Product 의 비즈니스 로직을 다루는 ProductService 를 호출하는 것이 적합함.
      * </pre>
      */
     @Autowired
@@ -124,7 +125,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean canWithDraw(Account account, Long amount){
-
         Account foundAccount = accountRepository.findById(account.getAccountNum()).orElseThrow();
         if(foundAccount.getBalance() >= amount){
             return true;

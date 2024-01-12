@@ -1,6 +1,5 @@
-<%@ page import="com.bankingsystem.banking.account.repository.domain.Account" %>
-<%@ page import="java.util.List" %>
 <%@ page import="com.bankingsystem.banking.account.DTO.AccountResponse" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -10,7 +9,7 @@
 
 <form method="POST">
     <%
-        List<AccountResponse> accounts =  (List<AccountResponse>) request.getSession().getAttribute("accounts");
+        ArrayList<AccountResponse> accounts =  (ArrayList<AccountResponse>) request.getSession().getAttribute("accounts");
         for (AccountResponse account : accounts){
     %>
     <input type="radio" name="accountNum" value = <%=account.getAccountNum()%>>계좌번호 : <%=account.getAccountNum()%> </input>
